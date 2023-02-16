@@ -12,7 +12,7 @@ if __name__ == "__main__":
     # RGB input
     input_channels = 3
     # RGB output
-    output_channels = NUM_CLASSES
+    output_channels = 1
 
     # Model
     model = SegNet(input_channels=input_channels, output_channels=output_channels)

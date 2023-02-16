@@ -10,12 +10,13 @@ from tqdm import tqdm
 from PIL import Image
 
 
-VOC_CLASSES = ('background',  # always index 0
-               'aeroplane', 'bicycle', 'bird', 'boat',
-               'bottle', 'bus', 'car', 'cat', 'chair',
-               'cow', 'diningtable', 'dog', 'horse',
-               'motorbike', 'person', 'pottedplant',
-               'sheep', 'sofa', 'train', 'tvmonitor')
+# VOC_CLASSES = ('background',  # always index 0
+#                'aeroplane', 'bicycle', 'bird', 'boat',
+#                'bottle', 'bus', 'car', 'cat', 'chair',
+#                'cow', 'diningtable', 'dog', 'horse',
+#                'motorbike', 'person', 'pottedplant',
+#                'sheep', 'sofa', 'train', 'tvmonitor')
+VOC_CLASSES = ('vine')
 
 NUM_CLASSES = len(VOC_CLASSES) + 1
 
