@@ -27,9 +27,9 @@ from dataloader import DataLoader as OwnDataLoader
 NUM_INPUT_CHANNELS = 3
 NUM_OUTPUT_CHANNELS = 1
 
-NUM_EPOCHS = 60
+NUM_EPOCHS = 100
 
-LEARNING_RATE = 1e-6
+LEARNING_RATE = 1e-4
 MOMENTUM = 0.9
 BATCH_SIZE = 8
 
@@ -45,8 +45,9 @@ parser = argparse.ArgumentParser(description='Train a SegNet model')
 parser.add_argument('--checkpoint')
 parser.add_argument('--gpu',default=1, type=int)
 parser.add_argument('--cs', dest='cs', default='rgb', type=str, help='color space: rgb, lab')
-parser.add_argument('--dir', dest='dir', default='./dataset/canopy_mask_dataset/group1/', type=str, help='dataset directory')
+parser.add_argument('--data_dir', dest='dir', default='./dataset/canopy_mask_dataset/group1/', type=str, help='dataset directory')
 parser.add_argument('--s', dest='session', default=1, type=int, help='training session')
+# parser.add_argument('--epochs', dest='epochs', default=100, type=int, help='number of epochs')
 
 args = parser.parse_args()
 
@@ -83,11 +84,13 @@ def train():
         delta = time.time() - t_start
         is_better = loss_f < prev_loss
 
+        if epoch%10==0:
+            torch.save({'epoch': epoch, 'model': model.state_dict(), },  "../models/model_s%s_%d.pth"%(str(args.session),epoch))
         if is_better:
             prev_loss = loss_f
-            torch.save(model.state_dict(),  "model_best_s"+str(args.session)+".pth")
+            torch.save({'epoch': epoch, 'model': model.state_dict(), },  "../models/model_best_s%s.pth"%(str(args.session)))
 
-        print("Epoch #{}\tLoss: {:.8f}\t Time: {:2f}s".format(epoch+1, loss_f, delta))
+        print("Epoch #{}\tLoss: {:.8f}\t Time: {:2f}s".format(epoch, loss_f, delta))
 
 
 if __name__ == "__main__":
@@ -127,7 +130,14 @@ if __name__ == "__main__":
 
 
     if args.checkpoint:
-        model.load_state_dict(torch.load(args.checkpoint))
+        # model.load_state_dict(torch.load(args.checkpoint))
+        load_name = os.path.join(args.checkpoint)
+        print("loading checkpoint %s" % (load_name))
+        state = model.state_dict()
+        checkpoint = torch.load(load_name)
+        checkpoint = {k: v for k, v in checkpoint['model'].items() if k in state}
+        state.update(checkpoint)
+        model.load_state_dict(state)
 
 
     optimizer = torch.optim.Adam(model.parameters(),

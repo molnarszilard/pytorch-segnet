@@ -31,7 +31,7 @@ def process_image(model,directory, filename,counter):
     img = cv2.imread(directory+filename)
     if args.save_type in ['splash','both']:
         imgmasked = img.copy()
-        imgmasked = cv2.resize(imgmasked,(640,480))
+        # imgmasked = cv2.resize(imgmasked,(640,480))
         imgmasked = np.moveaxis(imgmasked,-1,0)
         imgmasked = torch.from_numpy(imgmasked).float().unsqueeze(0)
     if args.cs=="lab":        
@@ -47,7 +47,7 @@ def process_image(model,directory, filename,counter):
     elif args.cs!="rgb":
         print("Unknown color space.")
         exit()
-    img = cv2.resize(img,(640,480))
+    # img = cv2.resize(img,(640,480))
     img = np.moveaxis(img,-1,0)
     img = torch.from_numpy(img).float().unsqueeze(0)
     # if args.cs=="rgb":
@@ -104,11 +104,19 @@ if __name__ == '__main__':
         model = model.cuda()
     print("Model initialization done.")  
     
-    load_name = os.path.join(args.model_path)
-    print("loading checkpoint %s" % (load_name))
-    model.load_state_dict(torch.load(args.model_path))
+    # load_name = os.path.join(args.model_path)
+    # print("loading checkpoint %s" % (load_name))
+    # model.load_state_dict(torch.load(args.model_path))
+    # torch.save({'epoch': 70, 'model': model.state_dict(), },  "../models/model_s%s_%d.pth"%(str(22),70))
     # if 'pooling_mode' in checkpoint.keys():
     #     POOLING_MODE = checkpoint['pooling_mode']
+    load_name = os.path.join(args.model_path)
+    print("loading checkpoint %s" % (load_name))
+    state = model.state_dict()
+    checkpoint = torch.load(load_name)
+    checkpoint = {k: v for k, v in checkpoint['model'].items() if k in state}
+    state.update(checkpoint)
+    model.load_state_dict(state)
     print("loaded checkpoint %s" % (load_name))
     # del checkpoint
     torch.cuda.empty_cache()
